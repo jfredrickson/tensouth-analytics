@@ -20,6 +20,7 @@ Run the database initialization scripts:
 
 ```
 docker compose run app /entrypoint.sh db createdb
+docker compose run app /entrypoint.sh db migrate
 ```
 
 Finally, bring up the app:
