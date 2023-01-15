@@ -30,7 +30,7 @@ services:
       - traefik.http.routers.plausible.entrypoints=websecure
       - traefik.http.routers.plausible.tls=true
       - traefik.http.routers.plausible.tls.certResolver=letsencrypt
-      - traefik.http.routers.plausible.rule=Host(`plausible.${DOMAIN}`)
+      - traefik.http.routers.plausible.rule=Host(`${HOST}`)
 
   db:
     image: postgres:14-alpine
