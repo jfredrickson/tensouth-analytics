@@ -1,0 +1,57 @@
+version: "3.8"
+
+networks:
+  reverse-proxy:
+    external: true
+  internal:
+    external: false
+
+volumes:
+  db_data: {}
+  events_db_data: {}
+
+services:
+  app:
+    image: plausible/analytics:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - events-db
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    networks:
+      - reverse-proxy
+      - internal
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=reverse-proxy
+      - traefik.http.routers.plausible.entrypoints=websecure
+      - traefik.http.routers.plausible.tls=true
+      - traefik.http.routers.plausible.tls.certResolver=letsencrypt
+      - traefik.http.routers.plausible.rule=Host(`plausible.${DOMAIN}`)
+
+  db:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - internal
+
+  events-db:
+    image: clickhouse/clickhouse-server:22.6-alpine
+    restart: unless-stopped
+    volumes:
+      - events_db_data:/var/lib/clickhouse
+      - ./clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro
+      - ./clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - internal
