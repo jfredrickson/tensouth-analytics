@@ -29,6 +29,7 @@ services:
       - traefik.docker.network=reverse-proxy
       - traefik.http.routers.plausible.entrypoints=websecure
       - traefik.http.routers.plausible.tls=true
+      - traefik.http.routers.plausible.tls.options=modern-12@file
       - traefik.http.routers.plausible.tls.certResolver=letsencrypt
       - traefik.http.routers.plausible.rule=Host(`${HOST}`)
 
